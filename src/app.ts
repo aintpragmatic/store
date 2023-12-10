@@ -1,12 +1,10 @@
 // import { MetaMaskSDK } from '@metamask/sdk';
-import { AnoteAbi } from './anoteabi';
+import { StoreAbi } from './storeabi';
 import { ethers } from 'ethers';
 import { ExternalProvider } from "@ethersproject/providers";
 import $ from 'jquery';
-import { accounts } from 'web3/lib/commonjs/eth.exports';
 
-const contractAddress = '0xe7f0f1585bdbd06b18dbb87099b87bd79bbd315b';
-// const contractAddress = '0xae60E1a4eF26671807411368Cc150631eF1456Fd';
+const contractAddress = '0xa174e60ef8b3b1fa7c71bb91d685191e915baaed';
 
 let signer;
 let provider;
@@ -49,19 +47,8 @@ const start = async () => {
         }
 
         if (signer != null) {
-            contract = new ethers.Contract(contractAddress, AnoteAbi, signer);
+            contract = new ethers.Contract(contractAddress, StoreAbi, signer);
             contract.connect(provider);
-    
-            if (accs != null) {
-                var we = await contract.withdrawExists(accs[0]);
-                if (we) {
-                    $("#wbtn").removeClass("btn-secondary");
-                    $("#wbtn").addClass("btn-success");
-                    $("#wbtn").prop("disabled", false);
-                } else {
-                    $("#nowe").fadeIn();
-                }
-            }
         }
     }
 };
@@ -77,49 +64,11 @@ if (window.ethereum == null || window.ethereum == undefined) {
     });
 }
 
-$("#wbtn").on("click", async function() {
+$("#mbtn").on("click", function() {
     $("#errMsg").fadeOut(function() {
         $("#errMsg").html('');
     });
-    $("#success").fadeOut(async function() {
-        $("#loading").fadeIn();
-
-        // const accounts = await window.ethereum.request({
-        //     method: 'eth_requestAccounts',
-        //     params: [],
-        // });
-
-       var count = contract._withdrawCount(accs[0]);
-       var cnt = 0;
-       await count;
-       await count.then((response) => cnt = response);
-
-       console.log(cnt);
-
-       var fee = 5000000000000000 * cnt;
-
-        const options = {value: ethers.BigNumber.from(fee)};
-        try {
-            var tx = await contract.withdraw(options);
-            var r = await tx.wait();
-            $("#loading").fadeOut(function() {
-                $("#success").fadeIn();
-            });
-        } catch (e: any) {
-            console.log(e);
-            $("#errMsg").html(e.message);
-            $("#errMsg").show();
-            $("#loading").fadeOut(function() {
-                $("#success").fadeIn();
-            });
-        }
-    });
-});
-
-$("#dbtn").on("click", async function() {
-    $("#errMsg").fadeOut(function() {
-        $("#errMsg").html('');
-    });
+    
     var address = $("#address").val();
     var amount = $("#amount").val();
 
@@ -132,17 +81,17 @@ $("#dbtn").on("click", async function() {
 
             if (address && amount && address?.toString().length > 0 && amount?.toString().length > 0) {
                 try {
-                    amount = Math.floor(parseFloat(amount?.toString()) * 100000000);
-                    var tx = await contract.deposit(address, amount);
+                    var amt = parseInt(amount?.toString())
+                    var fee = ethers.BigNumber.from("40000000000000000");
+                    const options = {value: fee.mul(amt)};
+                    console.log(options);
+                    var tx = await contract.mintNode(address, options);
                     await tx.wait()
                 } catch (e: any) {
                     console.log(e);
                     $("#errMsg").html(e.message);
                     $("#errMsg").show();
                 }
-        
-                $("#address").val('');
-                $("#amount").val('');
             }
     
             $("#loading").fadeOut(function() {
@@ -156,5 +105,16 @@ $("#dbtn").on("click", async function() {
                 $("#errMsg").fadeOut();
             }, 2000);
         });
+    }
+});
+
+$("#amount").on("keyup", function() {
+    var amount = $("#amount").val();
+
+    if (amount && amount?.toString().length > 0) {
+        var total = parseFloat(amount?.toString()) * 0.04;
+        $("#total").html(total.toFixed(2));
+    } else {
+        $("#total").html("0.00");
     }
 });
