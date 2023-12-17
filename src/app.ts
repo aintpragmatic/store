@@ -82,7 +82,7 @@ $("#mbtn").on("click", function() {
             if (address && amount && address?.toString().length > 0 && amount?.toString().length > 0) {
                 try {
                     var amt = parseInt(amount?.toString())
-                    var fee = ethers.BigNumber.from("40000000000000000");
+                    var fee = ethers.BigNumber.from("50000000000000000");
                     const options = {value: fee.mul(amt)};
                     console.log(options);
                     var tx = await contract.mintNode(address, options);
@@ -108,11 +108,38 @@ $("#mbtn").on("click", function() {
     }
 });
 
-$("#amount").on("keyup", function() {
+$("#amount").on("keyup", async function() {
     var amount = $("#amount").val();
+    var nodePrice = 0;
+    var nodeTier = 0;
+
+    await $.getJSON("https://node.anote.digital/addresses/data/3AQT89sRrWHqPSwrpfJAj3Yey7BCBTAy4jT/%25s__nodePrice", function(data) {
+        nodePrice = data.value / 100;
+    });
+
+    await $.getJSON("https://node.anote.digital/addresses/data/3AQT89sRrWHqPSwrpfJAj3Yey7BCBTAy4jT/%25s__nodeTier", function(data) {
+        nodeTier = data.value;
+    });
 
     if (amount && amount?.toString().length > 0) {
-        var total = parseFloat(amount?.toString()) * 0.04;
+        var amountInt = parseInt(amount?.toString());
+        var total = 0;
+
+        if (nodeTier >= amountInt) {
+            total = parseFloat(amount?.toString()) * nodePrice;
+        } else {
+            while (amountInt > 0) {
+                total += nodeTier * nodePrice;
+                amountInt -= nodeTier;
+                if (amountInt > 10) {
+                    nodeTier = 10;
+                } else {
+                    nodeTier = amountInt;
+                }
+                nodePrice += 0.01;
+            }
+        }
+
         $("#total").html(total.toFixed(2));
     } else {
         $("#total").html("0.00");
