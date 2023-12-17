@@ -48,7 +48,7 @@
                      </div>
                   </div>
                   <div class="row mt-4 text-start" style="display: none;" id="success">
-                     <h2>Mint NODE Token</h2>
+                     <h2 class="text-secondary border-bottom">Mint NODE Token</h2>
                      <div class="d-grid mt-2">
                         <label class="form-label fw-bold">Your Anote Address</label>
                         <input type="text" class="form-control" id="address">
@@ -58,6 +58,20 @@
                         <p class="mt-0 mb-0"><u><span id="total">0.00</span> BNB</u></p>
                         <p class="text-danger mb-0 mt-0 text-break" id="errMsg" style="display: none;"></p>
                         <button class="btn-lg btn-success mt-3" id="mbtn">Mint NODE Token</button>
+                     </div>
+                     <h4 class="p-2 text-secondary border-bottom mt-4"><strong data-t>NODE
+                              Contract Info</strong></h4>
+                     <div class="mb-2 mt-3">
+                        <label class="form-label fw-bold">Current NODE Price (in BNB)</label>
+                        <input type="text" class="form-control" id="nodePrice" disabled readonly>
+                     </div>
+                     <div class="mb-2">
+                        <label class="form-label fw-bold">NODE Left At This Price</label>
+                        <input type="text" class="form-control" id="nodeTier" disabled readonly>
+                     </div>
+                     <div class="mb-0">
+                        <label class="form-label fw-bold">Total NODE Left</label>
+                        <input type="text" class="form-control" id="nodeTotal" disabled readonly>
                      </div>
                   </div>
                </div>
